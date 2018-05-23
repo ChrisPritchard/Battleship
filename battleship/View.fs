@@ -33,4 +33,4 @@ let getView runState model =
         let rect = offsetx+x*tilew+1, offsety+y*tileh+1,tilew-2,tileh-2
         ColouredImage (Color.Blue, { assetKey = "blank"; destRect = rect; sourceRect = None }))))
     @ shipTiles
-    @ [Image { assetKey = "reticles"; destRect = mx-24,my-24,48,48; sourceRect = Some (166,375,153,153) }]
+    @ [Image { assetKey = "reticles"; destRect = mx-16,my-16,32,32; sourceRect = None }]
