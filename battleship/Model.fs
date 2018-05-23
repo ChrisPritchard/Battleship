@@ -1,7 +1,7 @@
 module Model
 
 let (boardx,boardy) = 10,10
-let shipList = [5;4;4;3;3;2]
+let shipList = [5;4;4;3;3;2;2]
 
 type GameModel = {
     players: PlayerState * PlayerState
