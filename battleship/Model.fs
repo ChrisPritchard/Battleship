@@ -25,7 +25,7 @@ let rec tilesIn tile direction length =
     let next = nextIn tile direction
     if next.x < 0 || next.x = boardx || next.y < 0 || next.y = boardy then
         []
-    else if length = 0 then
+    else if length = 1 then
         [next]
     else
         next::(tilesIn next direction (length - 1))
@@ -48,8 +48,9 @@ let randomPlacement () =
             y = random.Next (0, boardy) } 
         let dir = enum<Dir>(random.Next(0,4))
         let tiles = tilesIn tile dir length
-        if canPlace tiles board && tiles.Length = length
-        then (nameForLength length, tiles)
-        else findMatch length board
+        if canPlace tiles board && tiles.Length = length then 
+            (nameForLength length, tiles)
+        else 
+            findMatch length board
     List.fold (fun board shipLength -> 
         board @ [findMatch shipLength board]) [] shipList
