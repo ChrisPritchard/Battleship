@@ -1,14 +1,14 @@
 module Model
 
 let (boardx,boardy) = 10,10
-let shipList = [5;4;4;3;3;2;2]
+let shipList = [5;4;4;4;3;3;3;3;2;2]
 let random = new System.Random ()
 
 type GameModel = {
     players: PlayerState * PlayerState
     isFirstPlayerTurn: bool
 } and PlayerState = {
-    ships: Tile list list
+    ships: (string * Tile list) list
     shots: Tile list
 } and 
     Tile = { x: int; y: int }
@@ -28,10 +28,18 @@ let rec tilesIn tile direction length =
     else if length = 0 then
         [next]
     else
-        next::tilesIn next direction (length - 1)
+        next::(tilesIn next direction (length - 1))
 
 let canPlace tiles board = 
-    List.concat board |> List.exists (fun o -> List.contains o tiles) |> not
+    let boardTiles = List.collect snd board
+    boardTiles |> List.exists (fun o -> List.contains o tiles) |> not
+
+let nameForLength = 
+    function
+    | 2 -> "Submarine"
+    | 3 -> "Destroyer"
+    | 4 -> "Battleship"
+    | _ -> "Carrier"
 
 let randomPlacement () = 
     let rec findMatch length board =
@@ -41,7 +49,7 @@ let randomPlacement () =
         let dir = enum<Dir>(random.Next(0,4))
         let tiles = tilesIn tile dir length
         if canPlace tiles board && tiles.Length = length
-        then tiles
+        then (nameForLength length, tiles)
         else findMatch length board
     List.fold (fun board shipLength -> 
         board @ [findMatch shipLength board]) [] shipList

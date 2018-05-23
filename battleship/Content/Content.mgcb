@@ -25,3 +25,9 @@
 /processorParam:TextureFormat=Color
 /build:white.png
 
+#begin File.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Miramo.spritefont
