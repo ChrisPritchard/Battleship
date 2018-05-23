@@ -10,7 +10,7 @@ let resolution = Windowed ((offsetx*2)+(tilew*boardx),(offsety*2)+(tileh*boardy)
 
 let assetsToLoad = [
     Texture { key = "blank"; path = "Content/white" }
-    Texture { key = "reticles"; path = "Content/reticles" }
+    Texture { key = "cursor"; path = "Content/cursor" }
     Font { key = "default"; path = "Content/miramo" }
 ]
 
@@ -33,4 +33,4 @@ let getView runState model =
         let rect = offsetx+x*tilew+1, offsety+y*tileh+1,tilew-2,tileh-2
         ColouredImage (Color.Blue, { assetKey = "blank"; destRect = rect; sourceRect = None }))))
     @ shipTiles
-    @ [Image { assetKey = "reticles"; destRect = mx-16,my-16,32,32; sourceRect = None }]
+    @ [Image { assetKey = "cursor"; destRect = mx-16,my-16,32,32; sourceRect = None }]
