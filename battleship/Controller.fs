@@ -6,7 +6,6 @@ open GameCore
 let initialModel = {
     player = { ships = randomPlacement (); shots = [] }
     ai = { ships = randomPlacement (); shots = [] }
-    lastAIAction = 0.
     state = PlayerTurn
 }
 
@@ -24,7 +23,7 @@ let checkForShot (runState: RunState) model =
             if List.contains newTile model.player.shots then model
             else 
                 let newPlayer = { model.player with shots = newTile::model.player.shots }
-                { model with player = newPlayer; state = AITurn }
+                { model with player = newPlayer; state = AITurn 0. }
 
 
 let advanceGame runState gameModel = 
