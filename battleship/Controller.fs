@@ -30,9 +30,16 @@ let checkForShot (runState: RunState) model =
             if List.contains newTile model.player.shots then model
             else 
                 let newPlayer = { model.player with shots = newTile::model.player.shots }
-                { model with player = newPlayer }//; state = AITurn (runState.elapsed,false) }
+                { model with player = newPlayer; state = AITurn (runState.elapsed,false) }
 
-let advanceAi model hasActed = model 
+let advanceAi model runState hasActed =
+    let rec takeShot () =
+        let tile = { x = random.Next (0, boardx); y = random.Next (0, boardy) } 
+        if List.contains tile model.ai.shots then takeShot () else tile
+    if hasActed then { model with state = PlayerTurn }
+    else 
+        let newAi = { model.ai with shots = takeShot()::model.ai.shots }
+        { model with ai = newAi; state = AITurn (runState.elapsed,true) }
 
 let checkForRestart runState model = model
 
@@ -44,7 +51,7 @@ let advanceGame runState gameModel =
             | Title -> checkForStart runState model
             | Placement rem -> checkForPlacement runState model rem
             | PlayerTurn -> checkForShot runState model
-            | AITurn (last,acted) when last - runState.elapsed > timeBetweenAIActions -> advanceAi model acted
+            | AITurn (last,acted) when runState.elapsed - last > timeBetweenAIActions -> advanceAi model runState acted
             | GameOver -> checkForRestart runState model
             | _ -> model
         Some newState
