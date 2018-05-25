@@ -8,6 +8,11 @@ let initialModel = {
     ai = { ships = randomPlacement (); shots = [] }
     state = PlayerTurn
 }
+let timeBetweenAIActions = 1000.
+
+let checkForStart runState model = model
+
+let checkForPlacement runState model remaining = model
 
 let checkForShot (runState: RunState) model = 
     let (pressed,_) = runState.mouse.pressed
@@ -23,11 +28,22 @@ let checkForShot (runState: RunState) model =
             if List.contains newTile model.player.shots then model
             else 
                 let newPlayer = { model.player with shots = newTile::model.player.shots }
-                { model with player = newPlayer; state = AITurn 0. }
+                { model with player = newPlayer; state = AITurn (runState.elapsed,false) }
 
+let advanceAi model hasActed = model 
+
+let checkForRestart runState model = model
 
 let advanceGame runState gameModel = 
     match gameModel with
-    | Some model -> 
-        checkForShot runState model |> Some
+    | Some model ->
+        let newState =
+            match model.state with
+            | Title -> checkForStart runState model
+            | Placement rem -> checkForPlacement runState model rem
+            | PlayerTurn -> checkForShot runState model
+            | AITurn (last,acted) when last - runState.elapsed > timeBetweenAIActions -> advanceAi model acted
+            | GameOver -> checkForRestart runState model
+            | _ -> model
+        Some newState
     | None -> Some initialModel
