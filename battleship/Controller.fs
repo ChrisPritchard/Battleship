@@ -19,8 +19,10 @@ let checkForShot (runState: RunState) model =
     if not pressed then model
     else
         let (mx,my) = runState.mouse.position
-        let (rawx,rawy) = (float mx-float offsetx / float tilew, float my-float offsety / float tileh)
-        let (tx,ty) = (floor rawx |> int, floor rawy |> int)
+        let (offsetx,offsety) = playerShotsOffset
+        let (tilew,tileh) = playerShotsTileSize
+        let (rawx,rawy) = mx - offsetx, my - offsety
+        let (tx,ty) = floor (float rawx / float tilew) |> int, floor (float rawy / float tileh) |> int
         if tx < 0 || tx >= boardx || ty < 0 || ty >= boardy then
             model
         else
@@ -28,7 +30,7 @@ let checkForShot (runState: RunState) model =
             if List.contains newTile model.player.shots then model
             else 
                 let newPlayer = { model.player with shots = newTile::model.player.shots }
-                { model with player = newPlayer; state = AITurn (runState.elapsed,false) }
+                { model with player = newPlayer }//; state = AITurn (runState.elapsed,false) }
 
 let advanceAi model hasActed = model 
 

@@ -3,18 +3,18 @@ open GameCore
 open Model
 open Microsoft.Xna.Framework
 
-let (tilew,tileh) = 50,50
-let (offsetx,offsety) = 50,50
-
-let resolution = Windowed ((offsetx*2)+(tilew*boardx),(offsety*2)+(tileh*boardy))
+let resolution = Windowed (1200,600)
+let playerShotsOffset = 500,50
+let playerShotsTileSize = 50,50
 
 let assetsToLoad = [
     Texture { key = "blank"; path = "Content/white" }
+    Texture { key = "explosion"; path = "Content/explosion" }
     Texture { key = "cursor"; path = "Content/cursor" }
     Font { key = "default"; path = "Content/miramo" }
 ]
 
-let boardTiles = 
+let boardTiles (offsetx,offsety) (tilew,tileh) = 
     let boardSize = offsetx, offsety, tilew*boardx, tileh*boardy
     let back = ColouredImage (Color.Black, { assetKey = "blank"; destRect = boardSize; sourceRect = None })
     let sea = 
@@ -23,8 +23,8 @@ let boardTiles =
             ColouredImage (Color.Blue, { assetKey = "blank"; destRect = rect; sourceRect = None })))
     back::sea
 
-let shipTiles (shipName,tiles) = 
-    let label = Seq.head shipName |> string
+let shipTiles (offsetx,offsety) (tilew,tileh) (shipName,tiles) = 
+    let label = if shipName = "" then "" else Seq.head shipName |> string
     tiles |> List.collect(fun t -> 
         let pos = offsetx+t.x*tilew+3+tilew/2,offsety+t.y*tileh+3+tileh/2
         let rect = offsetx+t.x*tilew+3,offsety+t.y*tileh+3,tilew-6,tileh-6
@@ -33,10 +33,37 @@ let shipTiles (shipName,tiles) =
             ColouredText (Color.White, { assetKey = "default"; text = label; position = pos; origin = Centre; scale = 0.2 })
         ])
 
+let shotTiles (offsetx,offsety) (tilew,tileh) shots targets =
+    shots |> List.map (fun t ->
+        let rect = offsetx+t.x*tilew,offsety+t.y*tileh,tilew,tileh
+        if List.contains t targets then
+            ColouredImage (Color.Yellow, { assetKey = "explosion"; destRect = rect; sourceRect = None })
+        else
+            Image { assetKey = "explosion"; destRect = rect; sourceRect = None })
+
+let playerShips model =
+    let offset = 50,50
+    let tileSize = 40,40
+    
+    let playerShipTiles = model.player.ships |> List.collect (shipTiles offset tileSize)
+    let shipTiles = model.player.ships |> List.collect (fun (_,t) -> t)
+    let aiShots = shotTiles offset tileSize model.ai.shots shipTiles
+    boardTiles offset tileSize @ playerShipTiles @ aiShots
+
+let playerShots model = 
+    let offset = playerShotsOffset
+    let tileSize = playerShotsTileSize
+
+    let aiHitShipTiles = model.ai.ships |> List.collect (fun (shipName,tiles) ->
+        let hit = tiles |> List.filter (fun t -> List.contains t model.player.shots)
+        let name = if List.length hit = List.length tiles then shipName else ""
+        shipTiles offset tileSize (name,hit))
+    let aiShipTiles = model.ai.ships |> List.collect (fun (_,t) -> t)
+    let shots = shotTiles offset tileSize model.player.shots aiShipTiles
+    boardTiles offset tileSize @ aiHitShipTiles @ shots
+
 let getView runState model = 
-    let shipTiles = model.player.ships |> List.collect shipTiles
-            
     let (mx,my) = runState.mouse.position
     let cursor = Image { assetKey = "cursor"; destRect = mx-16,my-16,32,32; sourceRect = None }
 
-    boardTiles @ shipTiles @ [cursor]
+    playerShips model @ playerShots model @ [cursor]
