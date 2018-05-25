@@ -4,14 +4,10 @@ open View
 open GameCore
 
 let initialModel = {
-    players = 
-        { 
-            ships = randomPlacement (); shots = [] 
-        }, 
-        { 
-            ships = randomPlacement (); shots = [] 
-        }
-    isFirstPlayerTurn = true
+    player = { ships = randomPlacement (); shots = [] }
+    ai = { ships = randomPlacement (); shots = [] }
+    lastAIAction = 0.
+    state = PlayerTurn
 }
 
 let checkForShot (runState: RunState) model = 
@@ -24,15 +20,11 @@ let checkForShot (runState: RunState) model =
         if tx < 0 || tx >= boardx || ty < 0 || ty >= boardy then
             model
         else
-            let currentPlayer = if model.isFirstPlayerTurn then fst model.players else snd model.players
             let newTile = { x = tx; y = ty }
-            if List.contains newTile currentPlayer.shots then model
+            if List.contains newTile model.player.shots then model
             else 
-                let newPlayer = { currentPlayer with shots = newTile::currentPlayer.shots }
-                if model.isFirstPlayerTurn then 
-                    { model with players = (newPlayer, snd model.players); isFirstPlayerTurn = not model.isFirstPlayerTurn }
-                else 
-                    { model with players = (fst model.players, newPlayer); isFirstPlayerTurn = not model.isFirstPlayerTurn }
+                let newPlayer = { model.player with shots = newTile::model.player.shots }
+                { model with player = newPlayer; state = AITurn }
 
 
 let advanceGame runState gameModel = 

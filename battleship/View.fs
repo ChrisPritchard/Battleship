@@ -34,8 +34,7 @@ let shipTiles (shipName,tiles) =
         ])
 
 let getView runState model = 
-    let currentPlayer = if model.isFirstPlayerTurn then fst model.players else snd model.players
-    let shipTiles = currentPlayer.ships |> List.collect shipTiles
+    let shipTiles = model.player.ships |> List.collect shipTiles
             
     let (mx,my) = runState.mouse.position
     let cursor = Image { assetKey = "cursor"; destRect = mx-16,my-16,32,32; sourceRect = None }

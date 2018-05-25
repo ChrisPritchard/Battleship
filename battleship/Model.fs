@@ -5,9 +5,13 @@ let shipList = [5;4;4;4;3;3;3;3;2;2]
 let random = new System.Random ()
 
 type GameModel = {
-    players: PlayerState * PlayerState
-    isFirstPlayerTurn: bool
-} and PlayerState = {
+    state: GameState
+    player: PlayerState
+    ai: PlayerState
+    lastAIAction: float
+} and GameState = 
+    | Title | Placement | PlayerTurn | AITurn | GameOver 
+  and PlayerState = {
     ships: (string * Tile list) list
     shots: Tile list
 } and 
