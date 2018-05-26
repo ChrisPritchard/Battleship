@@ -2,6 +2,7 @@ module Controller
 open Model
 open View
 open GameCore
+open System.Linq.Expressions
 
 let initialModel = {
     player = { ships = randomPlacement (); shots = [] }
@@ -21,7 +22,23 @@ let findMouseTile (runState: RunState) =
     if tx < 0 || tx >= boardx || ty < 0 || ty >= boardy then None else Some { x = tx; y = ty }
 
 let checkForPlacement (runState: RunState) model (dir,remaining) = 
-    model
+    match remaining with
+    | [] -> { model with state = PlayerTurn }
+    | head::tail ->
+        let (left,right) = runState.mouse.pressed
+        let dir = if right then enum<Dir>((int dir + 1) % 4) else dir
+        match findMouseTile runState with
+        | Some tile when left ->
+            let tiles = tilesIn tile dir head
+            if canPlace tiles model.player.ships && List.length tiles = head then
+                let newShip = nameForLength head, tiles
+                { model with 
+                    player = { model.player with ships = newShip::model.player.ships } 
+                    state = Placement (dir,tail) }
+            else
+                { model with state = Placement (dir,remaining) }
+        | _ -> { model with state = Placement (dir,remaining) }
+
 
 let checkForShot (runState: RunState) model = 
     let (pressed,_) = runState.mouse.pressed
