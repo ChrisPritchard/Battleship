@@ -9,13 +9,13 @@ type GameModel = {
     player: PlayerState
     ai: PlayerState
 } and GameState = 
-    | Title | Placement of int list | PlayerTurn | AITurn of float * bool | GameOver 
+    | Title | Placement of (Dir * (int list)) | PlayerTurn | AITurn of float * bool | GameOver 
   and PlayerState = {
     ships: (string * Tile list) list
     shots: Tile list
 } and 
     Tile = { x: int; y: int }
-type Dir = | North = 0 | East = 1 | South = 2 | West = 3
+  and Dir = | North = 0 | East = 1 | South = 2 | West = 3
 
 let nextIn tile direction = 
     match direction with
