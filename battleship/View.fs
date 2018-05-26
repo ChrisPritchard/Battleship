@@ -62,8 +62,31 @@ let playerShots model =
     let shots = shotTiles offset tileSize model.player.shots aiShipTiles
     boardTiles offset tileSize @ aiHitShipTiles @ shots
 
+let renderTitle () =
+    []
+
+let renderPlacement runState model = 
+    []
+
+let renderPlayerTurn model = 
+    playerShips model @ playerShots model
+
+let renderAiTurn model = 
+    playerShips model @ playerShots model
+
+let renderGameOver model = 
+    []
+
 let getView runState model = 
     let (mx,my) = runState.mouse.position
     let cursor = Image { assetKey = "cursor"; destRect = mx-16,my-16,32,32; sourceRect = None }
 
-    playerShips model @ playerShots model @ [cursor]
+    let screen =
+        match model.state with
+        | Title -> renderTitle ()
+        | Placement _ -> renderPlacement runState model
+        | PlayerTurn -> renderPlayerTurn model
+        | AITurn _ -> renderAiTurn model
+        | GameOver -> renderGameOver model
+
+    screen @ [cursor]
