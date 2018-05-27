@@ -66,6 +66,10 @@ let renderTitle () =
     []
 
 let renderPlacement runState model = 
+    // player ships
+        // highlight over selected
+    // remaining list
+        // top market
     []
 
 let renderPlayerTurn model = 
