@@ -73,7 +73,7 @@ let playerShots model =
 let renderTitle () =
     []
 
-let renderTargetHighlight dir len runState offset tileSize = 
+let renderTargetHighlight dir len runState offset tileSize board = 
     match findMouseTile runState offset tileSize with
     | None -> []
     | Some t ->
@@ -82,7 +82,10 @@ let renderTargetHighlight dir len runState offset tileSize =
         |> List.map (fun img -> 
             match img with
             | ColouredImage (_,tx) ->
-                ColouredImage (Color.Red,tx)
+                let colour = 
+                    if canPlace tiles board then 
+                        Color.Green else Color.Red
+                ColouredImage (colour,tx)
             | _ -> img)
 
 let renderPlacement runState model (dir,rem) = 
@@ -94,7 +97,7 @@ let renderPlacement runState model (dir,rem) =
     let target = 
         match head with
         | None -> []
-        | Some len -> renderTargetHighlight dir len runState (ox,oy) tileSize
+        | Some len -> renderTargetHighlight dir len runState (ox,oy) tileSize model.player.ships
 
     let (rx,ry) = ox + 505,oy
     let spacing = 44
