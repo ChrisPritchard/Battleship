@@ -3,19 +3,22 @@ open Model
 open View
 open GameCore
 
-// let initialModel = {
-//     player = { ships = randomPlacement (); shots = [] }
-//     ai = { ships = randomPlacement (); shots = [] }
-//     state = PlayerTurn
-// }
 let initialModel = {
     player = { ships = []; shots = [] }
     ai = { ships = randomPlacement (); shots = [] }
-    state = Placement (Dir.North, shipList)
+    state = Title
 }
 let timeBetweenAIActions = 1000.
 
-let checkForStart runState model = model
+let checkForStart runState model = 
+    let (pressed,_) = runState.mouse.pressed
+    if not pressed then model
+    else
+        let (bx,by,bw,bh) = startButton
+        let (mx,my) = runState.mouse.position
+        if mx >= bx && mx < bx+bw && my >= by && my < by+bh then
+            { model with state = Placement (Dir.North,shipList) }
+        else model
 
 let checkForPlacement (runState: RunState) model (dir,remaining) = 
     match remaining with

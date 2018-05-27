@@ -9,6 +9,8 @@ let placementTilesize = 50,50
 let playerShotsOffset = 500,50
 let playerShotsTileSize = 50,50
 
+let startButton = 500,520,200,60
+
 let findMouseTile (runState: RunState) (offsetx,offsety) (tilew,tileh) =
     let (mx,my) = runState.mouse.position
     let (rawx,rawy) = mx - offsetx, my - offsety
@@ -71,7 +73,13 @@ let playerShots model =
     boardTiles offset tileSize @ aiHitShipTiles @ shots
 
 let renderTitle () =
-    []
+    let (bx,by,bw,bh) = startButton
+    [
+        Text { assetKey = "default"; text = "BATTLESHIP"; position = (600,200); origin = Centre; scale = 2. }
+        ColouredImage (Color.Black, { assetKey = "blank"; destRect = startButton; sourceRect = None })
+        ColouredImage (Color.White, { assetKey = "blank"; destRect = (bx+2,by+2,bw-4,bh-4); sourceRect = None })
+        Text { assetKey = "default"; text = "Place Ships"; position = (bx + bw/2,by + bh/2); origin = Centre; scale = 0.4 }
+    ]
 
 let renderTargetHighlight dir len runState offset tileSize board = 
     match findMouseTile runState offset tileSize with
