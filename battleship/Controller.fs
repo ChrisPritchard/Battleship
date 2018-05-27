@@ -38,7 +38,6 @@ let checkForPlacement (runState: RunState) model (dir,remaining) =
                 { model with state = Placement (dir,remaining) }
         | _ -> { model with state = Placement (dir,remaining) }
 
-
 let checkForShot (runState: RunState) model = 
     let (pressed,_) = runState.mouse.pressed
     if not pressed then model

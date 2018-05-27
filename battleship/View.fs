@@ -8,7 +8,6 @@ let placementOffset = 350,50
 let placementTilesize = 50,50
 let playerShotsOffset = 500,50
 let playerShotsTileSize = 50,50
-
 let startButton = 500,520,200,60
 
 let findMouseTile (runState: RunState) (offsetx,offsety) (tilew,tileh) =
