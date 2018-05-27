@@ -74,14 +74,24 @@ let renderPlacement runState model (dir,rem) =
     let (rx,ry) = ox + 470,oy
     let spacing = 44
 
-    let tileSizeSm = 40,40
+    let (tx,ty) = 40,40
     let remainingShips = 
         rem |> List.indexed |> List.collect (fun (i,len) ->
             let (x,y) = rx,ry + (i*spacing)
             let tiles = tilesIn { x = 0; y = 0} Dir.East len
-            shipTiles (x,y) tileSizeSm ((nameForLength len),tiles))
+            shipTiles (x,y) (tx,ty) ((nameForLength len),tiles))
     
-    boardTiles (ox,oy) tileSize @ playerShipTiles @ remainingShips
+    let head = List.tryHead rem
+    let highLight = 
+        match head with
+        | None -> []
+        | Some len ->
+            let (hx,hy,hw,hh) = rx-2 + tx,ry-2,(tx * len)+4,ty+4
+            [ ColouredImage (Color.Red, { assetKey = "blank"; destRect = (hx,hy,hw,hh); sourceRect = None });
+            ColouredImage (Color.White, { assetKey = "blank"; destRect = (hx+2,hy+2,hw-4,hh-4); sourceRect = None }) ]
+    
+    boardTiles (ox,oy) tileSize @ playerShipTiles 
+    @ highLight @ remainingShips
 
 let renderPlayerTurn model = 
     playerShips model @ playerShots model
