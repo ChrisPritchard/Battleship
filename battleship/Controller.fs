@@ -17,21 +17,13 @@ let timeBetweenAIActions = 1000.
 
 let checkForStart runState model = model
 
-let findMouseTile (runState: RunState) =
-    let (mx,my) = runState.mouse.position
-    let (offsetx,offsety) = playerShotsOffset
-    let (tilew,tileh) = playerShotsTileSize
-    let (rawx,rawy) = mx - offsetx, my - offsety
-    let (tx,ty) = floor (float rawx / float tilew) |> int, floor (float rawy / float tileh) |> int
-    if tx < 0 || tx >= boardx || ty < 0 || ty >= boardy then None else Some { x = tx; y = ty }
-
 let checkForPlacement (runState: RunState) model (dir,remaining) = 
     match remaining with
     | [] -> { model with state = PlayerTurn }
     | head::tail ->
         let (left,right) = runState.mouse.pressed
         let dir = if right then enum<Dir>((int dir + 1) % 4) else dir
-        match findMouseTile runState with
+        match findMouseTile runState placementOffset placementTilesize with
         | Some tile when left ->
             let tiles = tilesIn tile dir head
             if canPlace tiles model.player.ships && List.length tiles = head then
@@ -48,7 +40,7 @@ let checkForShot (runState: RunState) model =
     let (pressed,_) = runState.mouse.pressed
     if not pressed then model
     else
-        match findMouseTile runState with
+        match findMouseTile runState playerShotsOffset playerShotsTileSize with
         | None -> model
         | Some tile ->
             if List.contains tile model.player.shots then model

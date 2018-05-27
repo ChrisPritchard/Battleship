@@ -4,8 +4,16 @@ open Model
 open Microsoft.Xna.Framework
 
 let resolution = Windowed (1200,600)
+let placementOffset = 350,50
+let placementTilesize = 50,50
 let playerShotsOffset = 500,50
 let playerShotsTileSize = 50,50
+
+let findMouseTile (runState: RunState) (offsetx,offsety) (tilew,tileh) =
+    let (mx,my) = runState.mouse.position
+    let (rawx,rawy) = mx - offsetx, my - offsety
+    let (tx,ty) = floor (float rawx / float tilew) |> int, floor (float rawy / float tileh) |> int
+    if tx < 0 || tx >= boardx || ty < 0 || ty >= boardy then None else Some { x = tx; y = ty }
 
 let assetsToLoad = [
     Texture { key = "blank"; path = "Content/white" }
@@ -65,13 +73,30 @@ let playerShots model =
 let renderTitle () =
     []
 
+let renderTargetHighlight dir len runState offset tileSize = 
+    match findMouseTile runState offset tileSize with
+    | None -> []
+    | Some t ->
+        let tiles = tilesIn t dir len
+        shipTiles offset tileSize ((nameForLength len), tiles)
+        |> List.map (fun img -> 
+            match img with
+            | ColouredImage (_,tx) ->
+                ColouredImage (Color.Red,tx)
+            | _ -> img)
+
 let renderPlacement runState model (dir,rem) = 
-    let (ox,oy) = 350,50
-    let tileSize = 50,50
+    let (ox,oy) = placementOffset
+    let tileSize = placementTilesize
+    let head = List.tryHead rem
     
     let playerShipTiles = model.player.ships |> List.collect (shipTiles (ox,oy) tileSize)
-    
-    let (rx,ry) = ox + 470,oy
+    let target = 
+        match head with
+        | None -> []
+        | Some len -> renderTargetHighlight dir len runState (ox,oy) tileSize
+
+    let (rx,ry) = ox + 505,oy
     let spacing = 44
 
     let (tx,ty) = 40,40
@@ -80,17 +105,15 @@ let renderPlacement runState model (dir,rem) =
             let (x,y) = rx,ry + (i*spacing)
             let tiles = tilesIn { x = 0; y = 0} Dir.East len
             shipTiles (x,y) (tx,ty) ((nameForLength len),tiles))
-    
-    let head = List.tryHead rem
     let highLight = 
         match head with
         | None -> []
         | Some len ->
-            let (hx,hy,hw,hh) = rx-2 + tx,ry-2,(tx * len)+4,ty+4
+            let (hx,hy,hw,hh) = rx-2,ry-2,(tx * len)+4,ty+4
             [ ColouredImage (Color.Red, { assetKey = "blank"; destRect = (hx,hy,hw,hh); sourceRect = None });
             ColouredImage (Color.White, { assetKey = "blank"; destRect = (hx+2,hy+2,hw-4,hh-4); sourceRect = None }) ]
     
-    boardTiles (ox,oy) tileSize @ playerShipTiles 
+    boardTiles (ox,oy) tileSize @ playerShipTiles @ target
     @ highLight @ remainingShips
 
 let renderPlayerTurn model = 

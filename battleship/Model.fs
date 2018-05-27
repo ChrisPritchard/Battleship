@@ -26,12 +26,10 @@ let nextIn tile direction =
 
 let rec tilesIn tile direction length =
     let next = nextIn tile direction
-    if next.x < 0 || next.x = boardx || next.y < 0 || next.y = boardy then
-        []
-    else if length = 1 then
-        [next]
+    if length = 1 || next.x < 0 || next.x = boardx || next.y < 0 || next.y = boardy then
+        [tile]
     else
-        next::(tilesIn next direction (length - 1))
+        tile::(tilesIn next direction (length - 1))
 
 let canPlace tiles board = 
     let boardTiles = List.collect snd board
