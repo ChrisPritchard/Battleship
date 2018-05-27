@@ -65,12 +65,23 @@ let playerShots model =
 let renderTitle () =
     []
 
-let renderPlacement runState model = 
-    // player ships
-        // highlight over selected
-    // remaining list
-        // top market
-    []
+let renderPlacement runState model (dir,rem) = 
+    let (ox,oy) = 350,50
+    let tileSize = 50,50
+    
+    let playerShipTiles = model.player.ships |> List.collect (shipTiles (ox,oy) tileSize)
+    
+    let (rx,ry) = ox + 470,oy
+    let spacing = 44
+
+    let tileSizeSm = 40,40
+    let remainingShips = 
+        rem |> List.indexed |> List.collect (fun (i,len) ->
+            let (x,y) = rx,ry + (i*spacing)
+            let tiles = tilesIn { x = 0; y = 0} Dir.East len
+            shipTiles (x,y) tileSizeSm ((nameForLength len),tiles))
+    
+    boardTiles (ox,oy) tileSize @ playerShipTiles @ remainingShips
 
 let renderPlayerTurn model = 
     playerShips model @ playerShots model
@@ -88,7 +99,7 @@ let getView runState model =
     let screen =
         match model.state with
         | Title -> renderTitle ()
-        | Placement _ -> renderPlacement runState model
+        | Placement (dir,rem) -> renderPlacement runState model (dir,rem)
         | PlayerTurn -> renderPlayerTurn model
         | AITurn _ -> renderAiTurn model
         | GameOver -> renderGameOver model

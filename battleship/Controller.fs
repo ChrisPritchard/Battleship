@@ -2,12 +2,16 @@ module Controller
 open Model
 open View
 open GameCore
-open System.Linq.Expressions
 
+// let initialModel = {
+//     player = { ships = randomPlacement (); shots = [] }
+//     ai = { ships = randomPlacement (); shots = [] }
+//     state = PlayerTurn
+// }
 let initialModel = {
-    player = { ships = randomPlacement (); shots = [] }
+    player = { ships = []; shots = [] }
     ai = { ships = randomPlacement (); shots = [] }
-    state = Placement (Dir.North,shipList)
+    state = Placement (Dir.North, shipList)
 }
 let timeBetweenAIActions = 1000.
 
