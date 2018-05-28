@@ -38,6 +38,12 @@ let checkForPlacement (runState: RunState) model (dir,remaining) =
                 { model with state = Placement (dir,remaining) }
         | _ -> { model with state = Placement (dir,remaining) }
 
+let hasWon ships shots =
+    ships 
+        |> List.collect (fun (_,t) -> t)
+        |> List.except shots
+        |> List.isEmpty
+
 let checkForShot (runState: RunState) model = 
     let (pressed,_) = runState.mouse.pressed
     if not pressed then model
@@ -48,13 +54,20 @@ let checkForShot (runState: RunState) model =
             if List.contains tile model.player.shots then model
             else 
                 let newPlayer = { model.player with shots = tile::model.player.shots }
-                { model with player = newPlayer; state = AITurn (runState.elapsed,false) }
+                let newState = 
+                    if hasWon model.ai.ships newPlayer.shots
+                    then GameOver true else AITurn (runState.elapsed,false)
+                { model with player = newPlayer; state = newState }
 
 let advanceAi model runState hasActed =
     let rec takeShot () =
         let tile = { x = random.Next (0, boardx); y = random.Next (0, boardy) } 
         if List.contains tile model.ai.shots then takeShot () else tile
-    if hasActed then { model with state = PlayerTurn }
+    if hasActed then
+        let newState = 
+            if hasWon model.player.ships model.ai.shots
+            then GameOver false else PlayerTurn
+        { model with state = newState }
     else 
         let newAi = { model.ai with shots = takeShot()::model.ai.shots }
         { model with ai = newAi; state = AITurn (runState.elapsed,true) }
@@ -70,7 +83,7 @@ let advanceGame runState gameModel =
             | Placement (dir,rem) -> checkForPlacement runState model (dir,rem)
             | PlayerTurn -> checkForShot runState model
             | AITurn (last,acted) when runState.elapsed - last > timeBetweenAIActions -> advanceAi model runState acted
-            | GameOver -> checkForRestart runState model
+            | GameOver _ -> checkForRestart runState model
             | _ -> model
         Some newState
     | None -> Some initialModel

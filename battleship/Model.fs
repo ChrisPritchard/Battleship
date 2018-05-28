@@ -9,7 +9,8 @@ type GameModel = {
     player: PlayerState
     ai: PlayerState
 } and GameState = 
-    | Title | Placement of (Dir * (int list)) | PlayerTurn | AITurn of float * bool | GameOver 
+    | Title | Placement of (Dir * (int list)) 
+    | PlayerTurn | AITurn of float * bool | GameOver of bool
   and PlayerState = {
     ships: (string * Tile list) list
     shots: Tile list
