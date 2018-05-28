@@ -8,7 +8,8 @@ let placementOffset = 350,50
 let placementTilesize = 50,50
 let playerShotsOffset = 500,50
 let playerShotsTileSize = 50,50
-let startButton = 500,520,200,60
+let startButton = 500,440,200,60
+let restartButton = 500,520,200,60
 
 let findMouseTile (runState: RunState) (offsetx,offsety) (tilew,tileh) =
     let (mx,my) = runState.mouse.position
@@ -132,8 +133,15 @@ let renderPlayerTurn model =
 let renderAiTurn model = 
     playerShips model @ playerShots model
 
-let renderGameOver model = 
-    []
+let renderGameOver playerWon =        
+    let (bx,by,bw,bh) = restartButton
+    [
+        Text { assetKey = "default"; text = "GAME OVER"; position = (600,200); origin = Centre; scale = 2. }
+        Text { assetKey = "default"; text = (if playerWon then "You won!" else "You lost..."); position = (600,300); origin = Centre; scale = 1. }
+        ColouredImage (Color.Black, { assetKey = "blank"; destRect = restartButton; sourceRect = None })
+        ColouredImage (Color.White, { assetKey = "blank"; destRect = (bx+2,by+2,bw-4,bh-4); sourceRect = None })
+        Text { assetKey = "default"; text = "Title Screen"; position = (bx + bw/2,by + bh/2); origin = Centre; scale = 0.4 }
+    ]
 
 let getView runState model = 
     let (mx,my) = runState.mouse.position
@@ -145,6 +153,6 @@ let getView runState model =
         | Placement (dir,rem) -> renderPlacement runState model (dir,rem)
         | PlayerTurn -> renderPlayerTurn model
         | AITurn _ -> renderAiTurn model
-        | GameOver -> renderGameOver model
+        | GameOver playerWon -> renderGameOver playerWon
 
     screen @ [cursor]

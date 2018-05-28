@@ -72,7 +72,14 @@ let advanceAi model runState hasActed =
         let newAi = { model.ai with shots = takeShot()::model.ai.shots }
         { model with ai = newAi; state = AITurn (runState.elapsed,true) }
 
-let checkForRestart runState model = model
+let checkForRestart runState model = 
+    let (pressed,_) = runState.mouse.pressed
+    if not pressed then model
+    else
+        let (bx,by,bw,bh) = restartButton
+        let (mx,my) = runState.mouse.position
+        if mx >= bx && mx < bx+bw && my >= by && my < by+bh 
+        then initialModel else model
 
 let advanceGame runState gameModel = 
     match gameModel with
