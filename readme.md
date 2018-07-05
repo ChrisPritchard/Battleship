@@ -8,6 +8,10 @@ Each game turn, alternating players pick a shot on the other players board until
 
 Built in F#, referencing a MonoGame library I have built.
 
+## To run
+
+The repo contains two projects: game-core and battleship. The first is the monogame bits, used as a library by the main project 'battleship'. In order to run the game, you need to run 'dotnet run' from the battleship folder, or specify the project via `dotnet run -p ./battleship/battleship.fsproj`
+
 ## Supported platforms
 
 Being dotnet core 2.1, it should work on all platforms that supports (Windows, Linux, Mac). Tested (and largely coded on) Windows 10. A full list of dotnet core supported platforms can be found from here: <https://github.com/dotnet/core/blob/master/release-notes/2.1/2.1-supported-os.md>
