@@ -25,3 +25,9 @@ A note for mac users: part of the compilation of this game involves building the
 - Doing a sudo dotnet restore and a sudo dotnet build
 
 After the build succeeded, a sudo dotnet run started the game without issue.
+
+## Note on development sequence
+
+This project was the first developed after the __Realm of FSharp exercises__ [here](https://github.com/ChrisPritchard/RealmOfFSharp).
+
+The next project developed after this, and using the lessons learned, was __Tetris__ [here](https://github.com/ChrisPritchard/Tetris).
